@@ -29,7 +29,7 @@ var generalOptions = {
   },
   'c': {
     'options': ['c', 'backwardsCompatibility'],
-    'description': 'This option is provided for backwards-compatibility only. On systems  that  support  it,  this  option forces the print file to be copied to the spool directory before  printing. In CUPS, print files  are always sent to the scheduler via IPP which has the same effect.',
+    'description': 'This option is provided for backwards-compatibility only. On systems  that	support	 it,  this  option forces the print file to be copied to the spool directory before  printing. In CUPS, print files  are always sent to the scheduler via IPP which has the same effect.',
     'expects': '',
     'default': false
   },
@@ -67,7 +67,7 @@ var generalOptions = {
   },
   'q': {
     'options': ['q', 'priority'],
-    'description': 'Sets the job priority from  1 (lowest) to 100 (highest). The default priority is 50',
+    'description': 'Sets the job priority from	1 (lowest) to 100 (highest). The default priority is 50',
     'expects': 'number',
     'default': 1
   },
@@ -275,11 +275,17 @@ function Printer(name) {
   }
   self.name = name;
   self.jobs = [];
-  self.watch();
+  //self.watch();
 }
 
 Printer.list = function() {
-  return parseStdout(spawnSync('lpstat', ['-e']).stdout);
+  return parseStdout(spawnSync('lpstat', ['-p']).stdout)
+    .filter(function(line) {
+      return line.match(/^printer/);
+    })
+    .map(function(printer) {
+      return printer.match(/^printer (\S+)/)[1];
+    });
 };
 
 Printer.match = function(name) {
